@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rakhi Name Generator — Type & Download</title>
+<style>
+:root{ --bg:#fff8f0; --card:#fff; --accent:#d35400 }
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Open Sans',sans-serif; background:linear-gradient(180deg,#fff 0%, #fff8f0 100%); margin:0; padding:24px; color:#222}
+.wrap{max-width:920px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
+.card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+h1{font-size:20px;margin:0 0 8px}
+label{display:block;font-size:13px;color:#444;margin-top:12px}
+input[type=text], select, input[type=number]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6;font-size:14px}
+input[type=color]{padding:4px;height:44px;border-radius:8px;border:1px solid #e6e6e6}
+.preview{display:flex;flex-direction:column;gap:12px;align-items:center}
+canvas{border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.08); background:linear-gradient(180deg,#fff 0%, #fffefb 100%)}
+button{background:var(--accent);color:white;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+.row{display:flex;gap:10px;margin-top:12px}
+.small{font-size:12px;color:#666}
+footer{margin-top:16px;font-size:13px;color:#666}
+@media (max-width:800px){.wrap{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>Rakhi Name Generator</h1>
+<p class="small">Naam likhiye aur "Generate" pe click karke preview dekhiye. Phir PNG download karen.</p>
+
+<label>Naam (Name)</label>
+<input id="nameInput" type="text" placeholder="Jaise: Rahul" value="Rahul" />
+
+<label>Template</label>
+<select id="templateSelect">
+<option value="classic">Classic Circular Rakhi (Default)</option>
+<option value="floral">Floral Badge</option>
+<option value="modern">Modern Minimal</option>
+</select>
+
+<label>Font size (px)</label>
+<input id="fontSize" type="number" min="18" max="80" value="36" />
+
+<label>Text color</label>
+<input id="textColor" type="color" value="#b71c1c" />
+
+<label>Background color</label>
+<input id="bgColor" type="color" value="#fff8e1" />
+
+<div class="row">
+<button id="generateBtn">Generate Preview</button>
+<button id="downloadBtn">Download PNG</button>
+</div>
+
+<footer>
+Chahe to main aapke liye custom design bana doon? Bataiye. (Open-source — file locally chalaiye.)
+</footer>
+</div>
+
+<div class="card preview">
+<div style="display:flex;gap:12px;align-items:center;width:100%;justify-content:space-between">
+<strong>Preview</strong>
+<span class="small">Tip: use larger font for longer names</span>
+</div>
+<canvas id="canvas" width="800" height="480"></canvas>
+</div>
+</div>
+
+<script>
+// Rakhi name generator — single file. No external libs.
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const nameInput = document.getElementById('nameInput');
+const templateSelect = document.getElementById('templateSelect');
+const fontSizeInput = document.getElementById('fontSize');
+const textColorInput = document.getElementById('textColor');
+const bgColorInput = document.getElementById('bgColor');
+const generateBtn = document.getElementById('generateBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+
+function drawRakhi(options){
+const {name, template, fontSize, textColor, bgColor} = options;
+// clear
+ctx.clearRect(0,0,canvas.width,canvas.height);
+// background
+ctx.fillStyle = bgColor;
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+// center coords
+const cx = canvas.width/2;
+const cy = canvas.height/2 - 20;
+
+if(template === 'classic'){
+// threads
+for(let i=0;i<18;i++){
+const angle = (i/18)*Math.PI*2;
+ctx.beginPath();
+ctx.strokeStyle = (i%2===0)?'#b34200':'#f0a04b';
+ctx.lineWidth = 6;
+ctx.moveTo(cx + Math.cos(angle)*220, cy + Math.sin(angle)*30);
+ctx.lineTo(cx + Math.cos(angle)*120, cy + Math.sin(angle)*20);
+ctx.stroke();
+}
+// outer circle
+ctx.beginPath();
+ctx.fillStyle = '#ffd54f';
+ctx.arc(cx,cy,110,0,Math.PI*2);
+ctx.fill();
+// inner ornament
+ctx.beginPath();
+ctx.fillStyle = '#d84315';
+ctx.arc(cx,cy,70,0,Math.PI*2);
+ctx.fill();
+// decorative dots
+for(let a=0;a<12;a++){
+const ang = a/12*Math.PI*2;
+ctx.beginPath();
+ctx.fillStyle = (a%2? '#fff':'#ffe0b2');
+ctx.arc(cx + Math.cos(ang)*90, cy + Math.sin(ang)*90, 8,0,Math.PI*2);
+ctx.fill();
+}
+} else if(template === 'floral'){
+// big floral badge
+ctx.save();
+ctx.translate(cx,cy);
+for(let p=0;p<8;p++){
+ctx.beginPath();
+ctx.rotate(Math.PI*2/8);
+ctx.ellipse(0, -90, 40, 80, Math.PI/8, 0, Math.PI*2);
+ctx.fillStyle = '#f48fb1';
+ctx.fill();
+}
+ctx.restore();
+// center circle
+ctx.beginPath();
+ctx.fillStyle = '#ffecb3';
+ctx.arc(cx,cy,80,0,Math.PI*2);
+ctx.fill();
+} else if(template === 'modern'){
+// minimal rectangle motif
+ctx.fillStyle = '#fff';
+roundRect(ctx, cx-220, cy-90, 440, 180, 20, true, false);
+ctx.beginPath();
+ctx.fillStyle = '#ffe0b2';
+ctx.rect(cx-200, cy-70, 120, 140);
+ctx.fill();
+ctx.beginPath();
+ctx.fillStyle = '#d84315';
+ctx.rect(cx+40, cy-70, 120, 140);
+ctx.fill();
+}
+
+// name text
+ctx.fillStyle = textColor;
+const fs = Number(fontSize);
+ctx.font = `700 ${fs}px sans-serif`;
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+
+// shrink text if too long
+let measured = ctx.measureText(name);
+if(measured.width > 420){
+const newSize = Math.max(18, Math.floor(fs * 420 / measured.width));
+ctx.font = `700 ${newSize}px sans-serif`;
+}
+
+// drop shadow for depth
+ctx.shadowColor = 'rgba(0,0,0,0.15)';
+ctx.shadowBlur = 10;
+ctx.shadowOffsetY = 4;
+
+ctx.fillText(name, cx, cy);
+
+// small "Happy Raksha Bandhan" text
+ctx.shadowBlur = 0;
+ctx.font = `500 ${Math.max(14, Math.floor(fs/3))}px sans-serif`;
+ctx.fillStyle = '#5d4037';
+ctx.fillText('Happy Raksha Bandhan', cx, cy + Math.max(80, fs));
+}
+
+// helper to draw rounded rect
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+if(typeof r === 'undefined') r=5;
+ctx.beginPath();
+ctx.moveTo(x+r,y);
+ctx.arcTo(x+w,y,x+w,y+h,r);
+ctx.arcTo(x+w,y+h,x,y+h,r);
+ctx.arcTo(x,y+h,x,y,r);
+ctx.arcTo(x,y,x+w,y,r);
+ctx.closePath();
+if(fill) ctx.fill();
+if(stroke) ctx.stroke();
+}
+
+function getOptions(){
+return {
+name: nameInput.value.trim() || 'Your Name',
+template: templateSelect.value,
+fontSize: Number(fontSizeInput.value) || 36,
+textColor: textColorInput.value,
+bgColor: bgColorInput.value
+}
+}
+
+generateBtn.addEventListener('click', ()=>{
+drawRakhi(getOptions());
+});
+
+// initial draw
+drawRakhi(getOptions());
+
+// download
+downloadBtn.addEventListener('click', ()=>{
+// ensure preview updated
+drawRakhi(getOptions());
+const link = document.createElement('a');
+link.download = (nameInput.value.trim() || 'rakhi') + '.png';
+link.href = canvas.toDataURL('image/png');
+link.click();
+});
+
+// update preview live on change for better UX
+[nameInput, templateSelect, fontSizeInput, textColorInput, bgColorInput].forEach(el => {
+el.addEventListener('input', ()=>{
+// small debounce
+if(window._rakhiTimeout) clearTimeout(window._rakhiTimeout);
+window._rakhiTimeout = setTimeout(()=> drawRakhi(getOptions()), 160);
+});
+});
+
+</script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rakhi Name Generator — Type & Download</title>
+<style>
+:root{ --bg:#fff8f0; --card:#fff; --accent:#d35400 }
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Open Sans',sans-serif; background:linear-gradient(180deg,#fff 0%, #fff8f0 100%); margin:0; padding:24px; color:#222}
+.wrap{max-width:920px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
+.card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+h1{font-size:20px;margin:0 0 8px}
+label{display:block;font-size:13px;color:#444;margin-top:12px}
+input[type=text], select, input[type=number]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6;font-size:14px}
+input[type=color]{padding:4px;height:44px;border-radius:8px;border:1px solid #e6e6e6}
+.preview{display:flex;flex-direction:column;gap:12px;align-items:center}
+canvas{border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.08); background:linear-gradient(180deg,#fff 0%, #fffefb 100%)}
+button{background:var(--accent);color:white;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+.row{display:flex;gap:10px;margin-top:12px}
+.small{font-size:12px;color:#666}
+footer{margin-top:16px;font-size:13px;color:#666}
+@media (max-width:800px){.wrap{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>Rakhi Name Generator</h1>
+<p class="small">Naam likhiye aur "Generate" pe click karke preview dekhiye. Phir PNG download karen.</p>
+
+<label>Naam (Name)</label>
+<input id="nameInput" type="text" placeholder="Jaise: Rahul" value="Rahul" />
+
+<label>Template</label>
+<select id="templateSelect">
+<option value="classic">Classic Circular Rakhi (Default)</option>
+<option value="floral">Floral Badge</option>
+<option value="modern">Modern Minimal</option>
+</select>
+
+<label>Font size (px)</label>
+<input id="fontSize" type="number" min="18" max="80" value="36" />
+
+<label>Text color</label>
+<input id="textColor" type="color" value="#b71c1c" />
+
+<label>Background color</label>
+<input id="bgColor" type="color" value="#fff8e1" />
+
+<div class="row">
+<button id="generateBtn">Generate Preview</button>
+<button id="downloadBtn">Download PNG</button>
+</div>
+
+<footer>
+Chahe to main aapke liye custom design bana doon? Bataiye. (Open-source — file locally chalaiye.)
+</footer>
+</div>
+
+<div class="card preview">
+<div style="display:flex;gap:12px;align-items:center;width:100%;justify-content:space-between">
+<strong>Preview</strong>
+<span class="small">Tip: use larger font for longer names</span>
+</div>
+<canvas id="canvas" width="800" height="480"></canvas>
+</div>
+</div>
+
+<script>
+// Rakhi name generator — single file. No external libs.
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const nameInput = document.getElementById('nameInput');
+const templateSelect = document.getElementById('templateSelect');
+const fontSizeInput = document.getElementById('fontSize');
+const textColorInput = document.getElementById('textColor');
+const bgColorInput = document.getElementById('bgColor');
+const generateBtn = document.getElementById('generateBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+
+function drawRakhi(options){
+const {name, template, fontSize, textColor, bgColor} = options;
+// clear
+ctx.clearRect(0,0,canvas.width,canvas.height);
+// background
+ctx.fillStyle = bgColor;
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+// center coords
+const cx = canvas.width/2;
+const cy = canvas.height/2 - 20;
+
+if(template === 'classic'){
+// threads
+for(let i=0;i<18;i++){
+const angle = (i/18)*Math.PI*2;
+ctx.beginPath();
+ctx.strokeStyle = (i%2===0)?'#b34200':'#f0a04b';
+ctx.lineWidth = 6;
+ctx.moveTo(cx + Math.cos(angle)*220, cy + Math.sin(angle)*30);
+ctx.lineTo(cx + Math.cos(angle)*120, cy + Math.sin(angle)*20);
+ctx.stroke();
+}
+// outer circle
+ctx.beginPath();
+ctx.fillStyle = '#ffd54f';
+ctx.arc(cx,cy,110,0,Math.PI*2);
+ctx.fill();
+// inner ornament
+ctx.beginPath();
+ctx.fillStyle = '#d84315';
+ctx.arc(cx,cy,70,0,Math.PI*2);
+ctx.fill();
+// decorative dots
+for(let a=0;a<12;a++){
+const ang = a/12*Math.PI*2;
+ctx.beginPath();
+ctx.fillStyle = (a%2? '#fff':'#ffe0b2');
+ctx.arc(cx + Math.cos(ang)*90, cy + Math.sin(ang)*90, 8,0,Math.PI*2);
+ctx.fill();
+}
+} else if(template === 'floral'){
+// big floral badge
+ctx.save();
+ctx.translate(cx,cy);
+for(let p=0;p<8;p++){
+ctx.beginPath();
+ctx.rotate(Math.PI*2/8);
+ctx.ellipse(0, -90, 40, 80, Math.PI/8, 0, Math.PI*2);
+ctx.fillStyle = '#f48fb1';
+ctx.fill();
+}
+ctx.restore();
+// center circle
+ctx.beginPath();
+ctx.fillStyle = '#ffecb3';
+ctx.arc(cx,cy,80,0,Math.PI*2);
+ctx.fill();
+} else if(template === 'modern'){
+// minimal rectangle motif
+ctx.fillStyle = '#fff';
+roundRect(ctx, cx-220, cy-90, 440, 180, 20, true, false);
+ctx.beginPath();
+ctx.fillStyle = '#ffe0b2';
+ctx.rect(cx-200, cy-70, 120, 140);
+ctx.fill();
+ctx.beginPath();
+ctx.fillStyle = '#d84315';
+ctx.rect(cx+40, cy-70, 120, 140);
+ctx.fill();
+}
+
+// name text
+ctx.fillStyle = textColor;
+const fs = Number(fontSize);
+ctx.font = `700 ${fs}px sans-serif`;
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+
+// shrink text if too long
+let measured = ctx.measureText(name);
+if(measured.width > 420){
+const newSize = Math.max(18, Math.floor(fs * 420 / measured.width));
+ctx.font = `700 ${newSize}px sans-serif`;
+}
+
+// drop shadow for depth
+ctx.shadowColor = 'rgba(0,0,0,0.15)';
+ctx.shadowBlur = 10;
+ctx.shadowOffsetY = 4;
+
+ctx.fillText(name, cx, cy);
+
+// small "Happy Raksha Bandhan" text
+ctx.shadowBlur = 0;
+ctx.font = `500 ${Math.max(14, Math.floor(fs/3))}px sans-serif`;
+ctx.fillStyle = '#5d4037';
+ctx.fillText('Happy Raksha Bandhan', cx, cy + Math.max(80, fs));
+}
+
+// helper to draw rounded rect
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+if(typeof r === 'undefined') r=5;
+ctx.beginPath();
+ctx.moveTo(x+r,y);
+ctx.arcTo(x+w,y,x+w,y+h,r);
+ctx.arcTo(x+w,y+h,x,y+h,r);
+ctx.arcTo(x,y+h,x,y,r);
+ctx.arcTo(x,y,x+w,y,r);
+ctx.closePath();
+if(fill) ctx.fill();
+if(stroke) ctx.stroke();
+}
+
+function getOptions(){
+return {
+name: nameInput.value.trim() || 'Your Name',
+template: templateSelect.value,
+fontSize: Number(fontSizeInput.value) || 36,
+textColor: textColorInput.value,
+bgColor: bgColorInput.value
+}
+}
+
+generateBtn.addEventListener('click', ()=>{
+drawRakhi(getOptions());
+});
+
+// initial draw
+drawRakhi(getOptions());
+
+// download
+downloadBtn.addEventListener('click', ()=>{
+// ensure preview updated
+drawRakhi(getOptions());
+const link = document.createElement('a');
+link.download = (nameInput.value.trim() || 'rakhi') + '.png';
+link.href = canvas.toDataURL('image/png');
+link.click();
+});
+
+// update preview live on change for better UX
+[nameInput, templateSelect, fontSizeInput, textColorInput, bgColorInput].forEach(el => {
+el.addEventListener('input', ()=>{
+// small debounce
+if(window._rakhiTimeout) clearTimeout(window._rakhiTimeout);
+window._rakhiTimeout = setTimeout(()=> drawRakhi(getOptions()), 160);
+});
+});
+
+</script>
+</body>
+</html>
+#80FF00<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rakhi Name Generator — Type & Download</title>
+<style>
+:root{ --bg:#fff8f0; --card:#fff; --accent:#d35400 }
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,'Noto Sans','Open Sans',sans-serif; background:linear-gradient(180deg,#fff 0%, #fff8f0 100%); margin:0; padding:24px; color:#222}
+.wrap{max-width:920px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
+.card{background:var(--card);border-radius:14px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+h1{font-size:20px;margin:0 0 8px}
+label{display:block;font-size:13px;color:#444;margin-top:12px}
+input[type=text], select, input[type=number]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e6e6;font-size:14px}
+input[type=color]{padding:4px;height:44px;border-radius:8px;border:1px solid #e6e6e6}
+.preview{display:flex;flex-direction:column;gap:12px;align-items:center}
+canvas{border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.08); background:linear-gradient(180deg,#fff 0%, #fffefb 100%)}
+button{background:var(--accent);color:white;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+.row{display:flex;gap:10px;margin-top:12px}
+.small{font-size:12px;color:#666}
+footer{margin-top:16px;font-size:13px;color:#666}
+@media (max-width:800px){.wrap{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="card">
+<h1>Rakhi Name Generator</h1>
+<p class="small">Naam likhiye aur "Generate" pe click karke preview dekhiye. Phir PNG download karen.</p>
+
+<label>Naam (Name)</label>
+<input id="nameInput" type="text" placeholder="Jaise: Rahul" value="Rahul" />
+
+<label>Template</label>
+<select id="templateSelect">
+<option value="classic">Classic Circular Rakhi (Default)</option>
+<option value="floral">Floral Badge</option>
+<option value="modern">Modern Minimal</option>
+</select>
+
+<label>Font size (px)</label>
+<input id="fontSize" type="number" min="18" max="80" value="36" />
+
+<label>Text color</label>
+<input id="textColor" type="color" value="#b71c1c" />
+
+<label>Background color</label>
+<input id="bgColor" type="color" value="#fff8e1" />
+
+<div class="row">
+<button id="generateBtn">Generate Preview</button>
+<button id="downloadBtn">Download PNG</button>
+</div>
+
+<footer>
+Chahe to main aapke liye custom design bana doon? Bataiye. (Open-source — file locally chalaiye.)
+</footer>
+</div>
+
+<div class="card preview">
+<div style="display:flex;gap:12px;align-items:center;width:100%;justify-content:space-between">
+<strong>Preview</strong>
+<span class="small">Tip: use larger font for longer names</span>
+</div>
+<canvas id="canvas" width="800" height="480"></canvas>
+</div>
+</div>
+
+<script>
+// Rakhi name generator — single file. No external libs.
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const nameInput = document.getElementById('nameInput');
+const templateSelect = document.getElementById('templateSelect');
+const fontSizeInput = document.getElementById('fontSize');
+const textColorInput = document.getElementById('textColor');
+const bgColorInput = document.getElementById('bgColor');
+const generateBtn = document.getElementById('generateBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+
+function drawRakhi(options){
+const {name, template, fontSize, textColor, bgColor} = options;
+// clear
+ctx.clearRect(0,0,canvas.width,canvas.height);
+// background
+ctx.fillStyle = bgColor;
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+// center coords
+const cx = canvas.width/2;
+const cy = canvas.height/2 - 20;
+
+if(template === 'classic'){
+// threads
+for(let i=0;i<18;i++){
+const angle = (i/18)*Math.PI*2;
+ctx.beginPath();
+ctx.strokeStyle = (i%2===0)?'#b34200':'#f0a04b';
+ctx.lineWidth = 6;
+ctx.moveTo(cx + Math.cos(angle)*220, cy + Math.sin(angle)*30);
+ctx.lineTo(cx + Math.cos(angle)*120, cy + Math.sin(angle)*20);
+ctx.stroke();
+}
+// outer circle
+ctx.beginPath();
+ctx.fillStyle = '#ffd54f';
+ctx.arc(cx,cy,110,0,Math.PI*2);
+ctx.fill();
+// inner ornament
+ctx.beginPath();
+ctx.fillStyle = '#d84315';
+ctx.arc(cx,cy,70,0,Math.PI*2);
+ctx.fill();
+// decorative dots
+for(let a=0;a<12;a++){
+const ang = a/12*Math.PI*2;
+ctx.beginPath();
+ctx.fillStyle = (a%2? '#fff':'#ffe0b2');
+ctx.arc(cx + Math.cos(ang)*90, cy + Math.sin(ang)*90, 8,0,Math.PI*2);
+ctx.fill();
+}
+} else if(template === 'floral'){
+// big floral badge
+ctx.save();
+ctx.translate(cx,cy);
+for(let p=0;p<8;p++){
+ctx.beginPath();
+ctx.rotate(Math.PI*2/8);
+ctx.ellipse(0, -90, 40, 80, Math.PI/8, 0, Math.PI*2);
+ctx.fillStyle = '#f48fb1';
+ctx.fill();
+}
+ctx.restore();
+// center circle
+ctx.beginPath();
+ctx.fillStyle = '#ffecb3';
+ctx.arc(cx,cy,80,0,Math.PI*2);
+ctx.fill();
+} else if(template === 'modern'){
+// minimal rectangle motif
+ctx.fillStyle = '#fff';
+roundRect(ctx, cx-220, cy-90, 440, 180, 20, true, false);
+ctx.beginPath();
+ctx.fillStyle = '#ffe0b2';
+ctx.rect(cx-200, cy-70, 120, 140);
+ctx.fill();
+ctx.beginPath();
+ctx.fillStyle = '#d84315';
+ctx.rect(cx+40, cy-70, 120, 140);
+ctx.fill();
+}
+
+// name text
+ctx.fillStyle = textColor;
+const fs = Number(fontSize);
+ctx.font = `700 ${fs}px sans-serif`;
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+
+// shrink text if too long
+let measured = ctx.measureText(name);
+if(measured.width > 420){
+const newSize = Math.max(18, Math.floor(fs * 420 / measured.width));
+ctx.font = `700 ${newSize}px sans-serif`;
+}
+
+// drop shadow for depth
+ctx.shadowColor = 'rgba(0,0,0,0.15)';
+ctx.shadowBlur = 10;
+ctx.shadowOffsetY = 4;
+
+ctx.fillText(name, cx, cy);
+
+// small "Happy Raksha Bandhan" text
+ctx.shadowBlur = 0;
+ctx.font = `500 ${Math.max(14, Math.floor(fs/3))}px sans-serif`;
+ctx.fillStyle = '#5d4037';
+ctx.fillText('Happy Raksha Bandhan', cx, cy + Math.max(80, fs));
+}
+
+// helper to draw rounded rect
+function roundRect(ctx,x,y,w,h,r,fill,stroke){
+if(typeof r === 'undefined') r=5;
+ctx.beginPath();
+ctx.moveTo(x+r,y);
+ctx.arcTo(x+w,y,x+w,y+h,r);
+ctx.arcTo(x+w,y+h,x,y+h,r);
+ctx.arcTo(x,y+h,x,y,r);
+ctx.arcTo(x,y,x+w,y,r);
+ctx.closePath();
+if(fill) ctx.fill();
+if(stroke) ctx.stroke();
+}
+
+function getOptions(){
+return {
+name: nameInput.value.trim() || 'Your Name',
+template: templateSelect.value,
+fontSize: Number(fontSizeInput.value) || 36,
+textColor: textColorInput.value,
+bgColor: bgColorInput.value
+}
+}
+
+generateBtn.addEventListener('click', ()=>{
+drawRakhi(getOptions());
+});
+
+// initial draw
+drawRakhi(getOptions());
+
+// download
+downloadBtn.addEventListener('click', ()=>{
+// ensure preview updated
+drawRakhi(getOptions());
+const link = document.createElement('a');
+link.download = (nameInput.value.trim() || 'rakhi') + '.png';
+link.href = canvas.toDataURL('image/png');
+link.click();
+});
+
+// update preview live on change for better UX
+[nameInput, templateSelect, fontSizeInput, textColorInput, bgColorInput].forEach(el => {
+el.addEventListener('input', ()=>{
+// small debounce
+if(window._rakhiTimeout) clearTimeout(window._rakhiTimeout);
+window._rakhiTimeout = setTimeout(()=> drawRakhi(getOptions()), 160);
+});
+});
+
+</script>
+</body>
+</html>
